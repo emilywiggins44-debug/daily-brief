@@ -1,0 +1,51 @@
+# Emily's voice samples — paste real emails below
+# These help Claude draft replies that sound like you
+Hi Name,
+
+Hope you're doing well - following up to connect on product at DMN. Happy to work around your availability, or alternatively you can schedule here.
+
+Thanks,
+Emily
+
+Hi [Name],
+
+Nice to connect with another Retail Woman in Tech in the Bay! I’d love to hear more about what you’re working on at [company].
+
+I’m a senior product manager with 10+ years experience across data, boutique & mass retail, and CPG - most recently building retail media and loyalty analytics products at Circana.
+
+Would you have time later this week or next for a coffee chat? Happy to work around your schedule!
+
+Thanks,
+Emily
+  
+Thanks for connecting, [Name]!
+
+[Name], nice to meet you. I'll message you separately to find a time that works (and can totally be flexible if the little CEO of your household demands!)
+
+Thanks again,
+Emily
+
+[Name],
+
+  Thank you for taking the time to walk me through [company]'s team structure and growth vision. The focus on customer journey optimization and hands-on product ownership sounds like a great fit for how I work.
+
+I've attached my updated resume. Appreciate you keeping me in mind for opportunities that map to my retail media, reporting, and data collaboration background.
+
+Thank you,
+Emily
+  Hi [Name],
+
+  I'm a Senior Product Manager with 10+ years of experience across retail media, loyalty analytics, and campaign automation - and I'd love to be considered for the [name] role at [company].
+
+A few things that feel directly relevant:
+
+At Circana, I led the build of a self-service incrementality measurement platform that automated campaign reporting, cutting delivery time from days to hours and surfacing 10 new optimization insights.
+I designed a data feed integration that automated campaign registration and hit 80% adoption in 6 months — squarely in the campaign execution and automation space this role lives in.
+I've owned execution on a product roadmap supporting $500MM+ in annual ad spend, working closely with engineering, data science, and end users to ship products that land with clients (98% renewal rate).
+
+The owned media infrastructure work at Gap - powering campaign delivery across email, push, and personalization for four major brands - is exactly the kind of high-impact, cross-functional product challenge I'm looking for next.
+
+I've attached my resume. Happy to share more context if helpful.
+
+Thanks so much,
+Emily
