@@ -72,68 +72,62 @@ def generate_daily_brief(companies, email_data, calendar_data, voice_samples):
     today = datetime.now(timezone.utc).strftime("%A, %B %d, %Y")
     is_monday = is_weekly_summary_day()
 
-    prompt = f"""You are Emily's personal job search chief of staff. Today is {today}.
-
-You have access to three sources of data:
-
-1. HER COMPANY TRACKER (Google Sheet):
-{json.dumps(companies, indent=2)}
-
-2. HER INBOX (unread emails, last 14 days):
-{json.dumps(format_emails_for_claude(email_data['inbox']), indent=2)}
-
-3. HER SENT EMAILS (last 30 days):
-{json.dumps(format_emails_for_claude(email_data['sent']), indent=2)}
-
-4. HER CALENDAR (next 30 days):
-Today: {json.dumps(format_events_for_claude(calendar_data['today']), indent=2)}
-This week: {json.dumps(format_events_for_claude(calendar_data['this_week']), indent=2)}
-Next two weeks: {json.dumps(format_events_for_claude(calendar_data['next_two_weeks']), indent=2)}
-Long range: {json.dumps(format_events_for_claude(calendar_data['long_range']), indent=2)}
-
-5. EMILY'S WRITING VOICE (use this to draft replies):
-{voice_samples}
-
-YOUR TASK:
-{'Generate a WEEKLY MOMENTUM REPORT since today is Monday. ' if is_monday else 'Generate a DAILY BRIEF. '}
-
-{'WEEKLY MOMENTUM REPORT FORMAT:' if is_monday else 'DAILY BRIEF FORMAT:'}
-
-{'---WEEKLY FORMAT---' if is_monday else '---DAILY FORMAT---'}
-
-{'Weekly: summarize pipeline health, what moved forward, what stalled, who went quiet, where energy was spent vs where opportunity is, and recommended focus for the week. Keep it tight and strategic.' if is_monday else """
-Daily brief must include these sections in this order:
+    if is_monday:
+        task_instructions = "Generate a WEEKLY MOMENTUM REPORT. Summarize pipeline health, what moved forward, what stalled, who went quiet, where energy was spent vs where the opportunity is, and recommended focus for the week. Keep it tight and strategic."
+    else:
+        task_instructions = """Generate a DAILY BRIEF with these sections in order:
 
 PRIORITY ACTIONS
-List 3-5 items ranked by urgency. For each item that needs a reply, include a DRAFT in Emily's voice. Keep drafts concise and natural — 2-4 sentences max. Format each as:
+List 3-5 items ranked by urgency. For each item needing a reply include a DRAFT in Emily's voice. Keep drafts concise and natural, 2-4 sentences max. Format each as:
 [P1] Action needed
      DRAFT: draft text here
-"""}
 
-📅 TODAY
-List today\'s meetings with context and any prep nudges based on email history.
+TODAY
+List today's meetings with context and prep nudges based on email history.
 
-📆 THIS WEEK  
+THIS WEEK
 Upcoming interviews, coffee chats, deadlines this week.
 
-🔭 LONG RANGE
-Anything 2+ weeks out worth getting ahead of.
+LONG RANGE
+Anything 2 or more weeks out worth getting ahead of.
 
-🔇 GONE QUIET
-Companies marked active in her tracker with no email activity in 7+ days. Suggest a next move for each.
+GONE QUIET
+Companies marked active in her tracker with no email activity in 7 or more days. Suggest a next move for each.
 
-📤 WAITING ON THEM
+WAITING ON THEM
 Emails Emily sent with no reply yet. Flag anything overdue based on priority:
-- High priority: flag after 3 days
-- Medium priority: flag after 6 days  
-- Low priority: flag after 10 days
+High priority flag after 3 days, Medium priority flag after 6 days, Low priority flag after 10 days.
 
-Keep the entire brief concise and scannable. No fluff. Emily reads this at 6:30am.
-'''}
+Keep the entire brief concise and scannable. No fluff. Emily reads this at 6:30am."""
 
-Cross reference all three data sources together. If a calendar meeting matches a company in her tracker, connect them. If an email is from someone she has a meeting with, note it. Think strategically, not just as a list maker.
+    prompt = """You are Emily's personal job search chief of staff. Today is """ + today + """.
 
-Return plain text only, no markdown formatting, no asterisks, no pound signs."""
+You have access to four sources of data:
+
+1. HER COMPANY TRACKER:
+""" + json.dumps(companies, indent=2) + """
+
+2. HER INBOX (unread emails, last 14 days):
+""" + json.dumps(format_emails_for_claude(email_data['inbox']), indent=2) + """
+
+3. HER SENT EMAILS (last 30 days):
+""" + json.dumps(format_emails_for_claude(email_data['sent']), indent=2) + """
+
+4. HER CALENDAR:
+Today: """ + json.dumps(format_events_for_claude(calendar_data['today']), indent=2) + """
+This week: """ + json.dumps(format_events_for_claude(calendar_data['this_week']), indent=2) + """
+Next two weeks: """ + json.dumps(format_events_for_claude(calendar_data['next_two_weeks']), indent=2) + """
+Long range: """ + json.dumps(format_events_for_claude(calendar_data['long_range']), indent=2) + """
+
+5. EMILY'S WRITING VOICE:
+""" + voice_samples + """
+
+YOUR TASK:
+""" + task_instructions + """
+
+Cross reference all data sources. Connect calendar meetings to email threads to companies in her tracker. Think strategically.
+
+Return plain text only, no markdown, no asterisks, no pound signs."""
 
     response = client.messages.create(
         model="claude-opus-4-6",
