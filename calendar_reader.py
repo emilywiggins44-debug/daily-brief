@@ -77,4 +77,40 @@ def get_upcoming_events(days_ahead=30):
         ).execute()
 
         events = events_result.get("items", [])
-        parsed = [parse_event(e) for
+        parsed = [parse_event(e) for e in events]
+
+        # Bucket by timeframe
+        today = [e for e in parsed if e["days_away"] == 0]
+        this_week = [e for e in parsed if 1 <= e["days_away"] <= 7]
+        next_two_weeks = [e for e in parsed if 8 <= e["days_away"] <= 14]
+        long_range = [e for e in parsed if e["days_away"] > 14]
+
+        logger.info(f"Found {len(parsed)} events in next {days_ahead} days")
+
+        return {
+            "today": today,
+            "this_week": this_week,
+            "next_two_weeks": next_two_weeks,
+            "long_range": long_range,
+            "all": parsed
+        }
+
+    except Exception as e:
+        logger.error(f"Failed to fetch calendar events: {e}")
+        return {
+            "today": [],
+            "this_week": [],
+            "next_two_weeks": [],
+            "long_range": [],
+            "all": []
+        }
+
+if __name__ == "__main__":
+    events = get_upcoming_events()
+    print(f"Today: {len(events['today'])} events")
+    print(f"This week: {len(events['this_week'])} events")
+    print(f"Next two weeks: {len(events['next_two_weeks'])} events")
+    print(f"Long range: {len(events['long_range'])} events")
+    for e in events["all"][:5]:
+        print(f"\n{e['days_away']} days away — {e['title']}")
+        print(f"  Attendees: {e['attendees']}")
