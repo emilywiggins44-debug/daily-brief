@@ -1,1 +1,32 @@
-#
+name: Daily Brief
+
+on:
+  schedule:
+    # 6:30 AM Pacific (14:30 UTC) Monday through Saturday
+    - cron: '30 14 * * 1-6'
+  workflow_dispatch:
+    # Allows manual trigger for testing
+
+jobs:
+  run-brief:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run daily brief
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GMAIL_CREDENTIALS: ${{ secrets.GMAIL_CREDENTIALS }}
+          YOUR_EMAIL: ${{ secrets.YOUR_EMAIL }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+        run: python brief.py
