@@ -101,13 +101,14 @@ YOUR TASK:
 
 {'---WEEKLY FORMAT---' if is_monday else '---DAILY FORMAT---'}
 
-{'Weekly: summarize pipeline health, what moved forward, what stalled, who went quiet, where energy was spent vs where opportunity is, and recommended focus for the week. Keep it tight and strategic.' if is_monday else '''
+{'Weekly: summarize pipeline health, what moved forward, what stalled, who went quiet, where energy was spent vs where opportunity is, and recommended focus for the week. Keep it tight and strategic.' if is_monday else """
 Daily brief must include these sections in this order:
 
-⚡ PRIORITY ACTIONS
-List 3-5 items ranked by urgency. For each item that needs a reply, include a DRAFT in Emily\'s voice. Keep drafts concise and natural — 2-4 sentences max. Format each as:
+PRIORITY ACTIONS
+List 3-5 items ranked by urgency. For each item that needs a reply, include a DRAFT in Emily's voice. Keep drafts concise and natural — 2-4 sentences max. Format each as:
 [P1] Action needed
-     DRAFT: "draft text here"
+     DRAFT: draft text here
+"""}
 
 📅 TODAY
 List today\'s meetings with context and any prep nudges based on email history.
