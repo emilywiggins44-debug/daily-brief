@@ -93,4 +93,29 @@ def get_inbox_emails(companies):
     query = "is:unread newer_than:14d"
     emails = search_messages(service, query, max_results=30)
     logger.info(f"Found {len(emails)} unread emails")
-    retur
+    return emails
+
+def get_sent_emails(companies):
+    """Get sent emails from last 30 days to track follow ups needed."""
+    service = get_gmail_service()
+    query = "in:sent newer_than:30d"
+    emails = search_messages(service, query, max_results=50)
+    logger.info(f"Found {len(emails)} sent emails")
+    return emails
+
+def get_all_email_data(companies):
+    """Return inbox and sent emails for Claude to analyze."""
+    return {
+        "inbox": get_inbox_emails(companies),
+        "sent": get_sent_emails(companies)
+    }
+
+if __name__ == "__main__":
+    from sheets_reader import read_tracker
+    companies = read_tracker()
+    data = get_all_email_data(companies)
+    print(f"Inbox: {len(data['inbox'])} emails")
+    print(f"Sent: {len(data['sent'])} emails")
+    for email in data["inbox"][:3]:
+        print(f"\n--- {email['subject']} ({email['days_ago']} days ago) ---")
+        print(email["body"][:200])
