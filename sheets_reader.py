@@ -68,3 +68,13 @@ def get_active_companies(companies):
         c for c in companies
         if c.get("Stage", "") in active_stages
     ]
+
+    return sorted(
+        active,
+        key=lambda c: priority_order.get(c.get("Priority", "Low"), 2)
+    )
+
+if __name__ == "__main__":
+    companies = read_tracker()
+    for c in companies:
+        print(c)
