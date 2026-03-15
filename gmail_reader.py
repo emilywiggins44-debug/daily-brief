@@ -1,1 +1,96 @@
-#
+import os
+import json
+import logging
+import base64
+from datetime import datetime, timezone, timedelta
+from googleapiclient.discovery import build
+from google.oauth2.credentials import Credentials
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+def get_credentials():
+    creds_json = os.environ.get("GMAIL_CREDENTIALS")
+    creds_data = json.loads(creds_json)
+    return Credentials(
+        token=creds_data["token"],
+        refresh_token=creds_data["refresh_token"],
+        token_uri=creds_data["token_uri"],
+        client_id=creds_data["client_id"],
+        client_secret=creds_data["client_secret"],
+        scopes=creds_data["scopes"]
+    )
+
+def get_gmail_service():
+    return build("gmail", "v1", credentials=get_credentials())
+
+def decode_body(payload):
+    """Extract plain text body from email payload."""
+    body = ""
+    if "parts" in payload:
+        for part in payload["parts"]:
+            if part["mimeType"] == "text/plain":
+                data = part["body"].get("data", "")
+                if data:
+                    body += base64.urlsafe_b64decode(data).decode("utf-8", errors="ignore")
+    else:
+        data = payload["body"].get("data", "")
+        if data:
+            body = base64.urlsafe_b64decode(data).decode("utf-8", errors="ignore")
+    return body[:2000]
+
+def get_message_detail(service, msg_id):
+    """Get full details of a single email."""
+    try:
+        msg = service.users().messages().get(
+            userId="me",
+            id=msg_id,
+            format="full"
+        ).execute()
+
+        headers = {h["name"]: h["value"] for h in msg["payload"]["headers"]}
+        timestamp = int(msg["internalDate"]) / 1000
+        date = datetime.fromtimestamp(timestamp, tz=timezone.utc)
+
+        return {
+            "id": msg_id,
+            "subject": headers.get("Subject", ""),
+            "from": headers.get("From", ""),
+            "to": headers.get("To", ""),
+            "date": date,
+            "days_ago": (datetime.now(timezone.utc) - date).days,
+            "body": decode_body(msg["payload"]),
+            "thread_id": msg["threadId"]
+        }
+    except Exception as e:
+        logger.warning(f"Failed to get message {msg_id}: {e}")
+        return None
+
+def search_messages(service, query, max_results=20):
+    """Search Gmail and return message details."""
+    try:
+        results = service.users().messages().list(
+            userId="me",
+            q=query,
+            maxResults=max_results
+        ).execute()
+
+        messages = results.get("messages", [])
+        detailed = []
+        for msg in messages:
+            detail = get_message_detail(service, msg["id"])
+            if detail:
+                detailed.append(detail)
+        return detailed
+    except Exception as e:
+        logger.error(f"Gmail search failed for query '{query}': {e}")
+        return []
+
+def get_inbox_emails(companies):
+    """Get recent unread emails from recruiters and hiring managers."""
+    service = get_gmail_service()
+    company_names = [c.get("Company", "") for c in companies if c.get("Company")]
+    query = "is:unread newer_than:14d"
+    emails = search_messages(service, query, max_results=30)
+    logger.info(f"Found {len(emails)} unread emails")
+    retur
