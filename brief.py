@@ -83,10 +83,17 @@ List 3-5 items ranked by urgency. For each item needing a reply include a DRAFT 
      DRAFT: draft text here
 
 TODAY
-List today's meetings with context and prep nudges based on email history.
+For each meeting today:
+- Take the attendee emails and search through her inbox and sent mail to find any related threads
+- Identify who each attendee is and what company they represent based on those email threads
+- If the meeting title is vague, figure out who the person is from the email history
+- Flag any unread emails from attendees she has not responded to
+- Flag if she has not been in touch with the attendee recently and may need a prep or confirmation note
+- If there is no email history with an attendee at all, flag it as a cold or uncontextualized meeting
 
 THIS WEEK
-Upcoming interviews, coffee chats, deadlines this week.
+Apply the same attendee cross-reference logic to all meetings this week.
+Flag anything unconfirmed, missing email history, or needing prep.
 
 LONG RANGE
 Anything 2 or more weeks out worth getting ahead of.
