@@ -25,18 +25,29 @@ def get_gmail_service():
     return build("gmail", "v1", credentials=get_credentials())
 
 def decode_body(payload):
-    """Extract plain text body from email payload."""
+    """Extract plain text body from email payload, handling nested multipart."""
     body = ""
-    if "parts" in payload:
-        for part in payload["parts"]:
-            if part["mimeType"] == "text/plain":
-                data = part["body"].get("data", "")
-                if data:
-                    body += base64.urlsafe_b64decode(data).decode("utf-8", errors="ignore")
-    else:
-        data = payload["body"].get("data", "")
+
+    def extract_parts(part):
+        nonlocal body
+        mime_type = part.get("mimeType", "")
+        # Recurse into multipart containers
+        if mime_type.startswith("multipart"):
+            for subpart in part.get("parts", []):
+                extract_parts(subpart)
+        elif mime_type == "text/plain":
+            data = part.get("body", {}).get("data", "")
+            if data:
+                body += base64.urlsafe_b64decode(data).decode("utf-8", errors="ignore")
+
+    extract_parts(payload)
+
+    # Fallback to top level body if nothing found
+    if not body:
+        data = payload.get("body", {}).get("data", "")
         if data:
             body = base64.urlsafe_b64decode(data).decode("utf-8", errors="ignore")
+
     return body[:2000]
 
 def get_message_detail(service, msg_id):
