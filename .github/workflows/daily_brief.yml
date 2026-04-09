@@ -3,7 +3,7 @@ name: Daily Brief
 on:
   schedule:
     # 6:30 AM Pacific (14:30 UTC) Monday through Saturday
-    - cron: '45 15 * * 1-6'
+    - cron: '45 13 * * 1-6'
   workflow_dispatch:
     # Allows manual trigger for testing
 
